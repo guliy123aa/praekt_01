@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Turdimuratova Gulaysha | Hacker Terminal (Full)</title>
+  <meta name="description" content="Boot screen + terminal commands + matrix + glitch + dashboard + fake hacking + sound toggles" />
+  <style>
+    :root{
+      --bg:#050607;
+      --panel:#0b0f0c;
+      --panel2:#06110a;
+      --grid:rgba(0,255,140,.08);
+      --green:#00ff9a;
+      --green2:#00d67f;
+      --text:#d7ffe9;
+      --muted:#7ee9bb;
+      --warn:#ffd34a;
+      --red:#ff4d6d;
+      --shadow: 0 30px 80px rgba(0,0,0,.55);
+      --radius:18px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      background: radial-gradient(1200px 800px at 15% 10%, rgba(0,255,154,.10), transparent 55%),
+                  radial-gradient(900px 650px at 85% 15%, rgba(0,255,154,.08), transparent 50%),
+                  linear-gradient(180deg, #040505, #020303);
+      color:var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      overflow-x:hidden;
+    }
+    /* background layers */
+    #matrix{
+      position:fixed; inset:0; width:100%; height:100%;
+      z-index:0; opacity:.26; pointer-events:none;
+      filter: contrast(1.1) saturate(1.1);
+    }
+    .grid{
+      position:fixed; inset:0;
+      background:
+        linear-gradient(to right, var(--grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+      background-size: 42px 42px;
+      z-index:0; opacity:.35; pointer-events:none;
+      mask-image: radial-gradient(circle at 50% 25%, rgba(0,0,0,1), rgba(0,0,0,0.15) 60%, rgba(0,0,0,0) 78%);
+    }
+    .scanlines{
+      position:fixed; inset:0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.03) 0px,
+        rgba(255,255,255,.03) 1px,
+        transparent 2px,
+        transparent 4px
+      );
+      z-index:0;
+      opacity:.12;
+      pointer-events:none;
+      mix-blend-mode: overlay;
+    }
+    .vignette{
+      position:fixed; inset:0;
+      background: radial-gradient(circle at 50% 25%, transparent 0%, rgba(0,0,0,.55) 70%, rgba(0,0,0,.85) 100%);
+      z-index:0;
+      pointer-events:none;
+      opacity:.65;
+    }
+
+    /* boot overlay */
+    .boot{
+      position:fixed; inset:0;
+      z-index:10;
+      background: #010202;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    .bootbox{
+      width:min(980px, 100%);
+      border:1px solid rgba(0,255,154,.22);
+      border-radius:16px;
+      background: rgba(0,0,0,.55);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .bootbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 14px;
+      border-bottom:1px solid rgba(0,255,154,.16);
+      background: rgba(0,0,0,.35);
+    }
+    .dots{display:flex;gap:8px;align-items:center}
+    .dot{width:10px;height:10px;border-radius:50%}
+    .dot.red{background:var(--red)}
+    .dot.yellow{background:var(--warn)}
+    .dot.green{background:var(--green2)}
+    .boottitle{
+      font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+      color: rgba(215,255,233,.9);
+      opacity:.95;
+    }
+    .bootlog{
+      padding:16px 16px 18px;
+      color: var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      white-space:pre-line;
+      min-height: 240px;
+    }
+    .progresswrap{
+      padding:0 16px 18px;
+    }
+    .progress{
+      height:10px;
+      border-radius:999px;
+      border:1px solid rgba(0,255,154,.22);
+      background: rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .barfill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(0,255,154,.20), rgba(0,255,154,.85));
+      box-shadow: 0 0 18px rgba(0,255,154,.35);
+    }
+    .bootfoot{
+      padding:12px 16px;
+      border-top:1px solid rgba(0,255,154,.12);
+      background: rgba(0,0,0,.28);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; flex-wrap:wrap;
+      font-size:12px; color: rgba(126,233,187,.95);
+    }
+
+    /* main card */
+    .wrap{
+      position:relative; z-index:1;
+      min-height:100%;
+      display:flex; align-items:center; justify-content:center;
+      padding:28px 16px;
+    }
+    .card{
+      width:min(1180px, 100%);
+      background: linear-gradient(180deg, rgba(11,15,12,.92), rgba(6,17,10,.92));
+      border:1px solid rgba(0,255,154,.22);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      backdrop-filter: blur(8px);
+    }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px;
+      background: rgba(0,0,0,.35);
+      border-bottom:1px solid rgba(0,255,154,.18);
+    }
+    .title{
+      color:rgba(215,255,233,.9);
+      font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+      opacity:.9;
+    }
+    .status{
+      font-size:12px;
+      color:var(--muted);
+      display:flex; gap:10px; align-items:center;
+    }
+    .pulse{
+      width:8px;height:8px;border-radius:50%;
+      background:var(--green);
+      box-shadow:0 0 18px rgba(0,255,154,.75);
+      animation:pulse 1.2s infinite ease-in-out;
+    }
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.45);opacity:1}}
+
+    .layout{
+      display:grid;
+      grid-template-columns: 1fr 1.25fr;
+    }
+
+    /* left panel */
+    .left{
+      padding:22px;
+      border-right:1px solid rgba(0,255,154,.16);
+      background:
+        radial-gradient(800px 500px at 20% 10%, rgba(0,255,154,.08), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.22));
+    }
+    .photo{
+      position:relative;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid rgba(0,255,154,.25);
+      box-shadow: 0 18px 45px rgba(0,0,0,.5);
+      aspect-ratio: 4/5;
+      background:#020403;
+    }
+    .photo img{
+      width:100%; height:100%;
+      object-fit:cover; display:block;
+      filter: contrast(1.05) saturate(1.05);
+      transform: scale(1.02);
+    }
+    .scan{
+      position:absolute; inset:-30% -10%;
+      background: linear-gradient(180deg, transparent, rgba(0,255,154,.14), transparent);
+      transform: translateY(-55%);
+      animation: scan 2.9s infinite linear;
+      mix-blend-mode: screen;
+      pointer-events:none;
+    }
+    @keyframes scan{0%{transform:translateY(-55%)}100%{transform:translateY(90%)}}
+
+    .ascii{
+      margin-top:14px;
+      padding:14px;
+      border-radius:14px;
+      border:1px dashed rgba(0,255,154,.20);
+      background: rgba(0,0,0,.22);
+      color: rgba(215,255,233,.92);
+      font-size:12px;
+      line-height:1.25;
+      white-space:pre;
+      position:relative;
+      overflow:hidden;
+    }
+    .ascii::after{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(90deg, transparent, rgba(0,255,154,.08), transparent);
+      transform: translateX(-60%);
+      animation: sweep 4.5s infinite linear;
+      pointer-events:none;
+    }
+    @keyframes sweep{0%{transform:translateX(-60%)}100%{transform:translateX(120%)}}
+
+    .chips{margin-top:12px; display:flex; flex-wrap:wrap; gap:10px;}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:9px 12px; border-radius:999px;
+      border:1px solid rgba(0,255,154,.24);
+      background: rgba(0,0,0,.25);
+      color:var(--text);
+      font-size:12px;
+    }
+    .chip b{color:var(--green)}
+    .chip .k{opacity:.9;color:var(--muted)}
+    .chip .x{color:var(--green);text-shadow:0 0 12px rgba(0,255,154,.45)}
+
+    /* dashboard */
+    .dash{
+      margin-top:14px;
+      border-radius:16px;
+      border:1px solid rgba(0,255,154,.18);
+      background: rgba(0,0,0,.24);
+      overflow:hidden;
+    }
+    .dashhead{
+      padding:12px 14px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid rgba(0,255,154,.12);
+      background: rgba(0,0,0,.28);
+      font-size:12px;
+      color: rgba(126,233,187,.95);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+    .dashgrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      padding:12px;
+    }
+    .metric{
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,255,154,.12);
+      background: rgba(0,0,0,.20);
+      font-size:12px;
+      color: rgba(215,255,233,.95);
+    }
+    .metric .k{color:var(--muted); display:block; margin-bottom:8px;}
+    .metric .v{font-size:20px; color:var(--green); text-shadow:0 0 14px rgba(0,255,154,.28)}
+    .metric .s{margin-top:6px; color:rgba(126,233,187,.9)}
+    .pill{
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(0,255,154,.20);
+      color: var(--green);
+      background: rgba(0,0,0,.18);
+      font-size:11px;
+      margin-left:8px;
+    }
+
+    /* right */
+    .right{padding:22px 22px 24px;}
+    .h1{
+      font-size:22px; line-height:1.2; letter-spacing:.01em;
+      margin-bottom:10px;
+    }
+    .glitch{
+      position:relative; display:inline-block;
+      color:var(--text);
+      text-shadow: 0 0 18px rgba(0,255,154,.28);
+    }
+    .glitch::before,.glitch::after{
+      content:attr(data-text);
+      position:absolute; left:0; top:0; width:100%;
+      overflow:hidden; opacity:.55; pointer-events:none;
+    }
+    .glitch::before{
+      transform: translate(1px, -1px);
+      color: rgba(0,255,154,.9);
+      animation: glitch1 2.8s infinite linear alternate-reverse;
+    }
+    .glitch::after{
+      transform: translate(-1px, 1px);
+      color: rgba(255,77,109,.65);
+      animation: glitch2 3.3s infinite linear alternate-reverse;
+    }
+    @keyframes glitch1{
+      0%{clip-path: inset(2% 0 90% 0)}
+      18%{clip-path: inset(40% 0 45% 0)}
+      36%{clip-path: inset(72% 0 18% 0)}
+      54%{clip-path: inset(12% 0 70% 0)}
+      72%{clip-path: inset(58% 0 28% 0)}
+      100%{clip-path: inset(6% 0 88% 0)}
+    }
+    @keyframes glitch2{
+      0%{clip-path: inset(88% 0 6% 0)}
+      22%{clip-path: inset(30% 0 58% 0)}
+      44%{clip-path: inset(10% 0 80% 0)}
+      66%{clip-path: inset(55% 0 35% 0)}
+      88%{clip-path: inset(78% 0 15% 0)}
+      100%{clip-path: inset(92% 0 4% 0)}
+    }
+
+    .sub{
+      color: var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      margin-bottom:14px;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px dashed rgba(0,255,154,.22);
+      background: rgba(0,0,0,.22);
+    }
+
+    /* terminal */
+    .terminal{
+      border-radius:16px;
+      border:1px solid rgba(0,255,154,.18);
+      background: rgba(0,0,0,.22);
+      overflow:hidden;
+    }
+    .termhead{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 14px;
+      border-bottom:1px solid rgba(0,255,154,.12);
+      background: rgba(0,0,0,.28);
+      font-size:12px;
+      color: rgba(126,233,187,.95);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+    .toggles{display:flex; gap:10px; align-items:center;}
+    .toggle{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(0,255,154,.18);
+      background: rgba(0,0,0,.18);
+      color: rgba(215,255,233,.9);
+      cursor:pointer;
+      user-select:none;
+      font-size:11px;
+    }
+    .toggle b{color:var(--green)}
+    .term{
+      padding:14px;
+      min-height: 320px;
+      max-height: 420px;
+      overflow:auto;
+      font-size:13px;
+      line-height:1.55;
+      white-space:pre-wrap;
+      color: rgba(215,255,233,.95);
+    }
+    .term .k{color: var(--muted)}
+    .term .ok{color: var(--green)}
+    .term .warn{color: var(--warn)}
+    .term .bad{color: var(--red)}
+    .term .dim{opacity:.85}
+    .inputrow{
+      display:flex; align-items:center; gap:10px;
+      border-top:1px solid rgba(0,255,154,.12);
+      padding:10px 12px;
+      background: rgba(0,0,0,.26);
+    }
+    .prompt{color: var(--green); font-weight:700}
+    input{
+      flex:1;
+      background: transparent;
+      border:none;
+      outline:none;
+      color: rgba(215,255,233,.98);
+      font-size:13px;
+      font-family: inherit;
+    }
+    .cursor{
+      display:inline-block;
+      margin-left:2px;
+      color: var(--green);
+      animation: blink 1s step-end infinite;
+      text-shadow:0 0 16px rgba(0,255,154,.45);
+    }
+    @keyframes blink{ 50%{opacity:0} }
+
+    /* fake hacking panel */
+    .hackpanel{
+      margin-top:14px;
+      border-radius:16px;
+      border:1px solid rgba(0,255,154,.18);
+      background: rgba(0,0,0,.22);
+      overflow:hidden;
+    }
+    .hackhead{
+      padding:12px 14px;
+      border-bottom:1px solid rgba(0,255,154,.12);
+      background: rgba(0,0,0,.28);
+      font-size:12px;
+      color: rgba(126,233,187,.95);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .hackbody{padding:12px 14px;}
+    .row{display:flex; justify-content:space-between; gap:14px; align-items:center; margin:10px 0;}
+    .label{color: var(--muted); font-size:12px;}
+    .prog{
+      flex:1;
+      height:10px;
+      border-radius:999px;
+      border:1px solid rgba(0,255,154,.18);
+      background: rgba(0,0,0,.25);
+      overflow:hidden;
+      margin-left:12px;
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(0,255,154,.20), rgba(0,255,154,.85));
+      box-shadow: 0 0 18px rgba(0,255,154,.25);
+    }
+    .note{
+      margin-top:10px;
+      font-size:12px;
+      color: rgba(126,233,187,.95);
+      opacity:.9;
+    }
+
+    .footer{
+      padding:12px 16px;
+      border-top:1px solid rgba(0,255,154,.12);
+      background: rgba(0,0,0,.28);
+      display:flex; justify-content:space-between; align-items:center;
+      gap:12px; flex-wrap:wrap;
+      font-size:12px;
+      color:rgba(126,233,187,.95);
+    }
+    .mono{opacity:.9}
+    .small{opacity:.85}
+
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr}
+      .left{border-right:none;border-bottom:1px solid rgba(0,255,154,.16)}
+      .right{padding:18px}
+      .h1{font-size:20px}
+      .dashgrid{grid-template-columns:1fr}
+    }
+    @media (prefers-reduced-motion: reduce){
+      #matrix,.grid,.scanlines{display:none}
+      .scan{display:none}
+      .pulse{animation:none}
+      .glitch::before,.glitch::after{animation:none}
+      .ascii::after{animation:none}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <div class="grid"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+  <!-- BOOT SCREEN -->
+  <section class="boot" id="boot">
+    <div class="bootbox">
+      <div class="bootbar">
+        <div class="dots" aria-hidden="true">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <div class="boottitle">init://att-secure-boot</div>
+        <div class="status"><span class="pulse"></span><span>BOOTING</span></div>
+      </div>
+      <div class="bootlog" id="bootlog"></div>
+      <div class="progresswrap">
+        <div class="progress"><div class="barfill" id="bootbar"></div></div>
+      </div>
+      <div class="bootfoot">
+        <span class="mono">secure boot • kernel v1.7 • checksum ok</span>
+        <span class="small">press <b style="color:var(--green)">Enter</b> to skip</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN -->
+  <main class="wrap" id="main" style="visibility:hidden">
+    <section class="card" aria-label="Terminal ">
+      <div class="topbar">
+        <div class="dots" aria-hidden="true">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <div class="title">secure-shell://profile</div>
+        <div class="status"><span class="pulse"></span><span>ONLINE</span></div>
+      </div>
+
+      <div class="layout">
+        <!-- LEFT -->
+        <aside class="left">
+          <div class="photo">
+            <img src="gulaysha.jpg" alt="Turdimuratova Gulaysha" />
+            <div class="scan"></div>
+          </div>
+
+          <div class="ascii" aria-label="ASCII Banner">
+████████╗██████╗ ████████╗
+╚══██╔══╝██╔══██╗╚══██╔══╝
+   ██║   ██████╔╝   ██║
+   ██║   ██╔══██╗   ██║
+   ██║   ██║  ██║   ██║
+   ╚═╝   ╚═╝  ╚═╝   ╚═╝
+
+[ACCESS: GRANTED]
+          </div>
+
+          <div class="chips">
+            <div class="chip"><span class="x">█</span> <span class="k">LEVEL:</span> <b>3-kurs</b></div>
+            <div class="chip"><span class="x">▒</span> <span class="k">TRACK:</span> <b>ATT</b></div>
+            <div class="chip"><span class="x">░</span> <span class="k">MODE:</span> <b>STEALTH</b></div>
+          </div>
+
+          <div class="dash">
+            <div class="dashhead">
+              <span>network monitor</span>
+              <span class="pill">LIVE</span>
+            </div>
+            <div class="dashgrid">
+              <div class="metric">
+                <span class="k">CPU</span>
+                <div class="v"><span id="m_cpu">62</span>%</div>
+                <div class="s"><span class="k">load</span> <span id="m_load">1.42</span></div>
+              </div>
+              <div class="metric">
+                <span class="k">Firewall</span>
+                <div class="v"><span id="m_fw">ACTIVE</span></div>
+                <div class="s"><span class="k">rules</span> <span id="m_rules">148</span></div>
+              </div>
+              <div class="metric">
+                <span class="k">Connections</span>
+                <div class="v"><span id="m_conn">12</span></div>
+                <div class="s"><span class="k">ports</span> <span id="m_ports">3</span></div>
+              </div>
+              <div class="metric">
+                <span class="k">Threats blocked</span>
+                <div class="v"><span id="m_threats">248</span></div>
+                <div class="s"><span class="k">today</span> <span id="m_today">17</span></div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- RIGHT -->
+        <article class="right">
+          <div class="h1">
+            <span class="glitch" data-text="Turdimuratova Gulaysha Allambergenovna">
+              Turdimuratova Gulaysha Allambergenovna
+            </span>
+          </div>
+
+          <div class="sub">
+            <span style="color:var(--green);font-weight:700">root@att:~$</span>
+            <span class="k"> Terminal .</span><br/>
+            <span class="k">Commands:</span>
+            <span class="ok">help</span>, <span class="ok">whoami</span>, <span class="ok">info</span>, <span class="ok">skills</span>, <span class="ok">contact</span>, <span class="ok">scan</span>, <span class="ok">crack</span>, <span class="ok">defend</span>, <span class="ok">clear</span>
+          </div>
+
+          <div class="terminal">
+            <div class="termhead">
+              <span>terminal</span>
+              <div class="toggles">
+                <div class="toggle" id="t_sound"><b>♪</b> sound: <span id="v_sound">off</span></div>
+                <div class="toggle" id="t_glitch"><b>✶</b> glitch: <span id="v_glitch">on</span></div>
+                <div class="toggle" id="t_matrix"><b>▦</b> matrix: <span id="v_matrix">on</span></div>
+              </div>
+            </div>
+            <div class="term" id="term"></div>
+            <div class="inputrow">
+              <span class="prompt">SecPentester@att:~$</span>
+              <input id="cmd" autocomplete="off" spellcheck="false" placeholder="type a command and press Enter" />
+              <span class="cursor">█</span>
+            </div>
+          </div>
+
+          <div class="hackpanel">
+            <div class="hackhead">
+              <span>operation console</span>
+              <span class="pill" id="op_state">IDLE</span>
+            </div>
+            <div class="hackbody">
+              <div class="row">
+                <div class="label">IP scan</div>
+                <div class="prog"><div class="fill" id="p_scan"></div></div>
+              </div>
+              <div class="row">
+                <div class="label">Password crack</div>
+                <div class="prog"><div class="fill" id="p_crack"></div></div>
+              </div>
+              <div class="row">
+                <div class="label">Firewall bypass</div>
+                <div class="prog"><div class="fill" id="p_bypass"></div></div>
+              </div>
+              <div class="note" id="op_note">Run <b style="color:var(--green)">scan</b> or <b style="color:var(--green)">crack</b> in terminal to start a demo operation.</div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="footer">
+        <span class="mono">build: v2.0 • theme: hacker-terminal • effects: boot+matrix+glitch+ops</span>
+        <span class="small">© <span id="y"></span> • static deploy ready</span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ===== helpers
+    const $ = (id)=>document.getElementById(id);
+
+    // year
+    $("y").textContent = new Date().getFullYear();
+
+    // ===== sound (WebAudio) - optional toggle
+    let soundOn = false;
+    let audioCtx = null;
+
+    function beep(freq=880, dur=0.05, type="sine", gain=0.04){
+      if(!soundOn) return;
+      try{
+        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type;
+        o.frequency.value = freq;
+        g.gain.value = gain;
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start();
+        o.stop(audioCtx.currentTime + dur);
+      }catch(e){}
+    }
+
+    function typeSound(){
+      beep(990, 0.02, "square", 0.02);
+    }
+
+    // ===== boot screen
+    const boot = $("boot");
+    const main = $("main");
+    const bootlog = $("bootlog");
+    const bootbar = $("bootbar");
+
+    const bootLines = [
+      "Initializing secure environment...",
+      "Loading kernel modules: net, crypto, fs...",
+      "Mounting /dev/secure0 -> /mnt/att",
+      "Verifying signatures... OK",
+      "Starting firewall daemon... ACTIVE",
+      "Establishing encrypted channel... OK",
+      "Spawning terminal session... READY",
+      "Access granted. Welcome."
+    ];
+
+    let bootIdx = 0;
+    let bootProg = 0;
+    let bootDone = false;
+
+    function bootTick(){
+      if(bootDone) return;
+      if(bootIdx < bootLines.length){
+        bootlog.textContent += (bootIdx? "\n":"") + bootLines[bootIdx];
+        beep(740, 0.02, "square", 0.015);
+        bootIdx++;
+      }
+      bootProg = Math.min(100, bootProg + (8 + Math.random()*10));
+      bootbar.style.width = bootProg.toFixed(0) + "%";
+      if(bootProg >= 100 && bootIdx >= bootLines.length){
+        bootDone = true;
+        setTimeout(endBoot, 450);
+      }else{
+        setTimeout(bootTick, 380 + Math.random()*260);
+      }
+    }
+
+    function endBoot(){
+      boot.style.display = "none";
+      main.style.visibility = "visible";
+      $("cmd").focus();
+      printBanner();
+      // small start beep
+      beep(440, 0.06, "sine", 0.05);
+      beep(660, 0.06, "sine", 0.05);
+    }
+
+    document.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter" && !bootDone){
+        bootDone = true;
+        bootbar.style.width = "100%";
+        bootlog.textContent += (bootIdx ? "\n" : "") + "Boot skipped by user. Access granted.";
+        setTimeout(endBoot, 250);
+      }
+    });
+
+    bootTick();
+
+    // ===== matrix background
+    const canvas = $("matrix");
+    const ctx = canvas.getContext("2d");
+    let matrixOn = true;
+    let running = true;
+
+    function resize(){
+      canvas.width = window.innerWidth * devicePixelRatio;
+      canvas.height = window.innerHeight * devicePixelRatio;
+      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    const glyphs = "アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*";
+    let fontSize = 16;
+    let columns = Math.floor(window.innerWidth / fontSize);
+    let drops = new Array(columns).fill(1);
+
+    function resetCols(){
+      columns = Math.floor(window.innerWidth / fontSize);
+      drops = new Array(columns).fill(1);
+    }
+    window.addEventListener("resize", resetCols);
+
+    function draw(){
+      if(!running || !matrixOn) return;
+      ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+      ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+
+      ctx.font = fontSize + "px ui-monospace, monospace";
+      ctx.fillStyle = "rgba(0, 255, 154, 0.85)";
+
+      for(let i=0;i<drops.length;i++){
+        const text = glyphs[Math.floor(Math.random()*glyphs.length)];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+
+        ctx.fillText(text, x, y);
+
+        if(y > window.innerHeight && Math.random() > 0.975){
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    // ===== dashboard live metrics
+    function jitter(n, a){ return Math.max(0, n + (Math.random()*a - a/2)); }
+    let threats = 248;
+    setInterval(()=>{
+      const cpu = Math.round(jitter(62, 14));
+      const conn = Math.round(jitter(12, 8));
+      const ports = Math.max(1, Math.round(jitter(3, 2)));
+      threats += Math.random() > 0.85 ? 1 : 0;
+
+      $("m_cpu").textContent = cpu;
+      $("m_load").textContent = (jitter(1.42, 0.7)).toFixed(2);
+      $("m_rules").textContent = Math.round(jitter(148, 12));
+      $("m_conn").textContent = conn;
+      $("m_ports").textContent = ports;
+      $("m_threats").textContent = threats;
+      $("m_today").textContent = Math.round(jitter(17, 6));
+    }, 900);
+
+    // ===== terminal
+    const term = $("term");
+    const cmd = $("cmd");
+
+    const state = {
+      glitchOn: true,
+      opsRunning: false
+    };
+
+    function println(s){
+      term.textContent += s + "\n";
+      term.scrollTop = term.scrollHeight;
+    }
+
+    function printBanner(){
+      println("█ SYSTEM: ATT TERMINAL READY");
+      println("█ TYPE 'help' FOR COMMANDS");
+      println("");
+    }
+
+    const helpText = [
+      "help        - show commands",
+      "whoami      - show identity",
+      "info        - show education/institution",
+      "skills      - show skills list",
+      "contact     - show contact placeholders",
+      "scan        - demo: IP scan operation",
+      "crack       - demo: password cracking operation",
+      "defend      - demo: enable firewall hardening",
+      "clear       - clear terminal",
+      "about       - about this page"
+    ].join("\n");
+
+    function runCommand(raw){
+      const input = raw.trim();
+      if(!input) return;
+
+      println("root@att:~$ " + input);
+      beep(880, 0.03, "square", 0.02);
+
+      const [c, ...rest] = input.split(/\s+/);
+      const arg = rest.join(" ");
+
+      switch(c.toLowerCase()){
+        case "help":
+          println(helpText);
+          break;
+        case "whoami":
+          println("> Turdimuratova Gulaysha Allambergenovna");
+          println("> role: student (ATT)");
+          break;
+        case "info":
+          println("> Kurs: 3-kurs");
+          println("> Yo'nalish: Axborot xavfsizligi va texnologiyalari");
+          println("> Institut: Qaraqalpaqstan Awil Xojaliǵi hám Agrotehnologiyalar Instituti");
+          break;
+        case "skills":
+          println("> Skills (demo):");
+          println("  - Networking fundamentals");
+          println("  - Linux basics");
+          println("  - Web security basics");
+          println("  - Documentation & research");
+          break;
+        case "contact":
+          println("> Contact (edit inside HTML if needed):");
+          println("  - Telegram: @your_username");
+          println("  - Instagram: @your_username");
+          println("  - Email: you@example.com");
+          break;
+        case "about":
+          println("> This is a static hacker-terminal themed profile page.");
+          println("> It contains demo animations (no real hacking).");
+          break;
+        case "clear":
+          term.textContent = "";
+          break;
+        case "scan":
+          startOperation("SCAN");
+          break;
+        case "crack":
+          startOperation("CRACK");
+          break;
+        case "defend":
+          startOperation("DEFEND");
+          break;
+        default:
+          println("> command not found: " + c);
+          println("> type 'help'");
+      }
+      println("");
+    }
+
+    cmd.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter"){
+        const v = cmd.value;
+        cmd.value = "";
+        runCommand(v);
+      } else if(soundOn){
+        // subtle typing sound
+        if(e.key.length === 1) typeSound();
+      }
+    });
+
+    // ===== toggles
+    function setToggle(el, labelEl, value){
+      labelEl.textContent = value;
+      beep(660, 0.03, "sine", 0.04);
+    }
+
+    $("t_sound").addEventListener("click", async ()=>{
+      soundOn = !soundOn;
+      $("v_sound").textContent = soundOn ? "on" : "off";
+      if(soundOn){
+        try{
+          if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          await audioCtx.resume();
+        }catch(e){}
+        beep(523,0.06,"sine",0.06); beep(784,0.06,"sine",0.06);
+      }
+    });
+
+    $("t_matrix").addEventListener("click", ()=>{
+      matrixOn = !matrixOn;
+      $("v_matrix").textContent = matrixOn ? "on" : "off";
+      if(!matrixOn){
+        ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+      } else {
+        draw();
+      }
+      beep(520, 0.03, "square", 0.03);
+    });
+
+    $("t_glitch").addEventListener("click", ()=>{
+      state.glitchOn = !state.glitchOn;
+      $("v_glitch").textContent = state.glitchOn ? "on" : "off";
+      document.querySelectorAll(".glitch").forEach(el=>{
+        el.style.animation = state.glitchOn ? "" : "none";
+      });
+      // Also stop pseudo animations by toggling a class:
+      if(!state.glitchOn){
+        document.documentElement.style.setProperty("--red", "rgba(255,77,109,.0)");
+      } else {
+        document.documentElement.style.setProperty("--red", "#ff4d6d");
+      }
+      beep(610, 0.03, "sine", 0.04);
+    });
+
+    // ===== fake operations
+    const opState = $("op_state");
+    const opNote = $("op_note");
+    const pScan = $("p_scan");
+    const pCrack = $("p_crack");
+    const pByp = $("p_bypass");
+
+    function setP(el, v){ el.style.width = Math.max(0, Math.min(100, v)) + "%"; }
+
+    function resetOps(){
+      setP(pScan, 0); setP(pCrack, 0); setP(pByp, 0);
+      opState.textContent = "IDLE";
+    }
+
+    function startOperation(kind){
+      if(state.opsRunning){
+        println("> operation already running...");
+        return;
+      }
+      state.opsRunning = true;
+      opState.textContent = kind;
+      opNote.innerHTML = "Running <b style='color:var(--green)'>" + kind + "</b> demo operation...";
+      beep(330,0.06,"sine",0.06);
+
+      let a=0,b=0,c=0;
+      const t = setInterval(()=>{
+        // random progress behaviour per operation
+        if(kind==="SCAN"){
+          a = Math.min(100, a + (6 + Math.random()*10));
+          b = Math.min(100, b + (2 + Math.random()*6));
+          c = Math.min(100, c + (1 + Math.random()*4));
+          setP(pScan, a); setP(pCrack, b); setP(pByp, c);
+          if(Math.random()>0.65) beep(740,0.02,"square",0.015);
+        }else if(kind==="CRACK"){
+          a = Math.min(100, a + (2 + Math.random()*6));
+          b = Math.min(100, b + (6 + Math.random()*12));
+          c = Math.min(100, c + (2 + Math.random()*8));
+          setP(pScan, a); setP(pCrack, b); setP(pByp, c);
+          if(Math.random()>0.55) beep(860,0.02,"square",0.02);
+        }else if(kind==="DEFEND"){
+          a = Math.min(100, a + (4 + Math.random()*8));
+          b = Math.min(100, b + (2 + Math.random()*6));
+          c = Math.min(100, c + (6 + Math.random()*10));
+          setP(pScan, a); setP(pCrack, b); setP(pByp, c);
+          if(Math.random()>0.6) beep(520,0.02,"sine",0.02);
+        }
+
+        if(a>=100 && b>=100 && c>=100){
+          clearInterval(t);
+          opState.textContent = "DONE";
+          opNote.innerHTML = "<span class='ok'>Operation complete.</span> (demo) Type <b style='color:var(--green)'>clear</b> or run another command.";
+          println("> " + kind + " complete (demo).");
+          println("> status: OK");
+          beep(440,0.06,"sine",0.06); beep(660,0.06,"sine",0.06); beep(880,0.06,"sine",0.06);
+          setTimeout(()=>{ resetOps(); state.opsRunning=false; }, 1400);
+        }
+      }, 220);
+    }
+
+    // ===== auto-typing demo (once)
+    const demoLines = [
+      "help",
+      "whoami",
+      "info",
+      "scan"
+    ];
+    let demoDone = false;
+
+    function autoDemo(){
+      if(demoDone) return;
+      demoDone = true;
+      let i=0;
+      const runNext = ()=>{
+        if(i>=demoLines.length) return;
+        const line = demoLines[i++];
+        // type into input visually
+        let j=0;
+        const typer = setInterval(()=>{
+          cmd.value = line.slice(0, j);
+          if(soundOn && j>0) typeSound();
+          j++;
+          if(j>line.length){
+            clearInterval(typer);
+            runCommand(line);
+            cmd.value = "";
+            setTimeout(runNext, 700);
+          }
+        }, 45);
+      };
+      setTimeout(runNext, 900);
+    }
+
+    // start auto demo shortly after boot ends
+    const demoObserver = new MutationObserver(()=>{
+      if(boot.style.display === "none"){
+        // run demo only if user hasn't typed yet
+        setTimeout(()=>{ if(!cmd.value) autoDemo(); }, 900);
+        demoObserver.disconnect();
+      }
+    });
+    demoObserver.observe(boot, {attributes:true, attributeFilter:["style"]});
+  </script>
+</body>
+</html>
